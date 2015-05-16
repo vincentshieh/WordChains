@@ -19,21 +19,18 @@ class WordChainer
     end
   end
 
-  def filter_by_length(length)
-    @words_of_a_particular_length[length] ||=
-      @dictionary.select { |word| word.length == length }
-  end
+  def build_path(target)
+    path = []
+    current_word = target
 
-  def run(source, target)
-    @current_words = [source]
-    @all_seen_words = { source => nil }
-
-    until @current_words.empty?
-      @current_words = explore_current_words(target)
-      break if @all_seen_words.include?(target)
+    until @all_seen_words[current_word].nil?
+      path.unshift(current_word)
+      current_word = @all_seen_words[current_word]
     end
 
-    puts build_path(target)
+    path.unshift(current_word)
+
+    path
   end
 
   def explore_current_words(target)
@@ -51,17 +48,20 @@ class WordChainer
     new_current_words
   end
 
-  def build_path(target)
-    path = []
-    current_word = target
+  def filter_by_length(length)
+    @words_of_a_particular_length[length] ||=
+      @dictionary.select { |word| word.length == length }
+  end
 
-    until @all_seen_words[current_word].nil?
-      path.unshift(current_word)
-      current_word = @all_seen_words[current_word]
+  def run(source, target)
+    @current_words = [source]
+    @all_seen_words = { source => nil }
+
+    until @current_words.empty?
+      @current_words = explore_current_words(target)
+      break if @all_seen_words.include?(target)
     end
 
-    path.unshift(current_word)
-
-    path
+    puts build_path(target)
   end
 end
